@@ -1,7 +1,11 @@
 package hello.core.singleton;
 
 import hello.core.AppConfig;
+import hello.core.member.MemberRepository;
 import hello.core.member.MemberService;
+import hello.core.member.MemberServiceImpl;
+import hello.core.order.OrderService;
+import hello.core.order.OrderServiceImpl;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,5 +44,19 @@ public class SingletonTest {
         MemberService memberService2 = applicationContext.getBean("memberService",MemberService.class);
 
         Assertions.assertThat(memberService1).isSameAs(memberService2);
+    }
+    @Test
+    @DisplayName("싱글톤 패턴, 다중 호출 되는 Repository 싱글톤인가?")
+    void springChildContainer() {
+        ApplicationContext applicationContext = new AnnotationConfigReactiveWebApplicationContext(AppConfig.class);
+
+        //1.조회 : 요청 시, 객체를 생성
+        MemberRepository memberRepository = applicationContext.getBean(MemberRepository.class);
+        MemberServiceImpl memberService = applicationContext.getBean("memberService",MemberServiceImpl.class);
+        OrderServiceImpl orderService = applicationContext.getBean("orderService",OrderServiceImpl.class);
+        System.out.println(memberService.getMemberRepository());
+        System.out.println(orderService.getMemberRepository());
+        System.out.println(memberRepository);
+        Assertions.assertThat(memberService.getMemberRepository()).isSameAs(memberRepository);
     }
 }
